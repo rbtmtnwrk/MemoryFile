@@ -1,2 +1,3 @@
 # MemoryFile
-php Memories storage manager. Organize and de-dupe photos and movies.
+
+php Memories storage manager. Currently unstable.
