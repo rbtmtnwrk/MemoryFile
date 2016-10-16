@@ -4,11 +4,16 @@ use MemoryFile\Testing\TestCase;
 
 class SerivceTest extends TestCase
 {
-    public function test_service()
+    public function test_service_create()
     {
-        $dir = '/Users/rob.marton/projects/console/MemoryFile/photos';
+        $dir = '/test/directory';
 
-        $service = new Service($dir);
+        $service = Service::create($dir);
+
+        var_dump(print_r([
+            'file' => __FILE__ . ' line ' . __LINE__,
+            'service' => $service,
+        ], true));
     }
 }
 

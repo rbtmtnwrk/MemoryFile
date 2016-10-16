@@ -6,24 +6,13 @@ class Repository
     protected $repositoryPath;
     protected $log;
 
-    public function setRepositoryPath($repositoryPath)
-    {
-        $this->repositoryPath = $repositoryPath;
-
-        return $this;
-    }
-
-    public function __construct($repositoryPath)
-    {
-        $this->setRepositoryPath($repositoryPath);
-
-        $this->log = LoggerFactory::newLogger($repositoryPath);
-    }
+    use \MemoryFile\LoggableTrait;
+    use \MemoryFile\RepositoryPathTrait;
 
     private function createPath($path)
     {
         $subs  = explode('/', $path);
-        $check = $this->repositoryPath;
+        $check = $this->getRepositoryPath();
 
         foreach ($subs as $sub) {
             $check .= '/' . $sub;
@@ -35,11 +24,11 @@ class Repository
     {
         $this->createPath($path);
 
-        $destination = $this->repositoryPath . '/' . $path . '/' . $splFileInfo->getBaseName();
+        $destination = $this->getRepositoryPath() . '/' . $path . '/' . $splFileInfo->getBaseName();
 
         $same = file_exists($destination) && (sha1_file($destination) == sha1_file($splFileInfo->getPathName()));
 
-        $same && $this->log->warning('Memory Exists:' . $destination);
+        $same && $this->getLog()->warning('Memory Exists:' . $destination);
 
         (! $same) && copy($splFileInfo->getPathName(), $destination);
 

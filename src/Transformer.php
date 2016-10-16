@@ -16,6 +16,24 @@ class Transformer
         return "Y-m-d G:i:s";
     }
 
+    public function getMimePhoto()
+    {
+        return [
+            'image/tiff' => 'tiff',
+            'image/jpeg' =>  'jpg',
+        ];
+    }
+
+    public function getMimeMovie()
+    {
+        return [
+            'video/quicktime' => 'mov',
+            'video/avi'       => 'avi',
+            'video/msvideo'   => 'avi',
+            'video/x-msvideo' => 'avi',
+        ];
+    }
+
     public function setExif($exif)
     {
         $this->exif = $exif;
@@ -56,9 +74,9 @@ class Transformer
             'video/x-msvideo' => 'avi',
         ];
 
-        if (array_key_exists($mimeType, $mimePhoto)) {
+        if (array_key_exists($mimeType, $this->getMimePhoto())) {
             return 'photo';
-        } else if (array_key_exists($mimeType, $mimeMovie)) {
+        } else if (array_key_exists($mimeType, $this->getMimeMovie())) {
             return 'movie';
         }
 
