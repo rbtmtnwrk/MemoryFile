@@ -1,5 +1,5 @@
 <?php
-namespace MemoryFile;
+namespace MemoryFile\FileSystem;
 
 /**
  * Original class takes from the following lib:

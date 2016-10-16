@@ -1,5 +1,5 @@
 <?php
-namespace MemoryFile;
+namespace MemoryFile\FileSystem;
 
 /**
  * Original class takes from the following lib:
@@ -19,16 +19,16 @@ namespace MemoryFile;
  */
 
 /**
- * Directory name filter that uses regular expression.
+ * File name filter that uses regular expression.
  *
  * <br />
  * How to use it:
  * <code>
  * $startPath = '.'; // Current directory
- * $pattern = '/^[^\.]/i'; // "Not starting with dot"
+ * $pattern = '/\.php$/i'; // "Terminating with .php"
  *
  * $dirIt = new RecursiveDirectoryIterator( $startPath );
- * $filter = new DirNameFilter( $dirIt, $pattern );
+ * $filter = new FileNameFilter( $dirIt, $pattern );
  * $itIt = new RecursiveIteratorIterator( $filter, RecursiveIteratorIterator::SELF_FIRST );
  *
  * foreach ( $itIt as $file ) {
@@ -39,16 +39,15 @@ namespace MemoryFile;
  * @author  Thiago Delgado Pinto
  * @version 1.0
  */
-
-class DirnameFilter extends AbstractFilesystemRegexFilter
+class FilenameFilter extends AbstractFilesystemRegexFilter
 {
     /**
-     * Filter directories against the regex
+     * Filter files against the regex
      * @return string
      */
     public function accept()
     {
-        return ( ! $this->isDir() || preg_match($this->regex, $this->getFilename()));
+        return ( ! $this->isFile() || preg_match($this->regex, strtolower($this->getFilename())));
     }
 }
 
