@@ -1,0 +1,19 @@
+{
+    "name": "rbtmtnwrk/memoryfile",
+    "description": "php Memories storage manager.",
+    "authors": [
+        {
+            "name": "Rob Marton",
+            "email": "rob.marton@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "monolog/monolog": "^1.21"
+    },
+    "autoload": {
+        "psr-4": {
+            "MemoryFile\\": "src/"
+        }
+    }
+}
