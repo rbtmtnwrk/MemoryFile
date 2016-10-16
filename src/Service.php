@@ -7,7 +7,7 @@ class Service
 
     public function setRepositoryPath($path)
     {
-        $this->repositoryPath($path);
+        $this->repositoryPath = $path;
 
         return $this;
     }
@@ -19,9 +19,9 @@ class Service
         $this->log = LoggerFactory::newLogger($repositoryPath);
     }
 
-    public function read($path)
+    public function import($path)
     {
-
+        //
     }
 }
 
