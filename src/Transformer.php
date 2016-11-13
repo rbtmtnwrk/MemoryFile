@@ -104,20 +104,20 @@ class Transformer
         $systemDate = $this->splFileInfo->getCTime();
         $systemDate = $this->isMac() ? $this->statDate() : $systemDate;
         $xifDate    = null;
-        $nicePath   = null;
+        $path       = null;
 
         $this->hasExif() && isset($this->exif['EXIF']['DateTimeOriginal']) && ($xifDate = strtotime($this->exif['EXIF']['DateTimeOriginal']));
 
         (! $xifDate) && $this->hasExif() && isset($this->exif['IDF0']['DateTime']) && ($xifDate = strtotime($this->exif['IDF0']['DateTime']));
 
-        $xifDate && ($nicePath = $this->getDatePath($xifDate));
+        $xifDate && ($path = $this->getDatePath($xifDate));
 
-        (! $nicePath) && ($nicePath = $this->getDatePath($systemDate));
+        (! $path) && ($path = $this->getDatePath($systemDate));
 
         $systemDate = date($this->getDateFormat(), $systemDate);
         $xifDate    = date($this->getDateFormat(), $xifDate);
 
-        return compact('systemDate', 'xifDate', 'nicePath');
+        return compact('systemDate', 'xifDate', 'path');
     }
 
     /**
@@ -172,8 +172,8 @@ class Transformer
         $type   = $this->type($mime);
         $date   = $this->date();
         $suffix = $type == 'movie' ? 'MOVIES' : $source;
-        $nice   = $date['nicePath'] . '/' . $suffix;
+        $destination    = $date['path'] . '/' . $suffix;
 
-        return compact('path', 'source', 'mime', 'type', 'date', 'nice');
+        return compact('path', 'source', 'mime', 'type', 'date', 'destination');
     }
 }

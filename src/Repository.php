@@ -20,11 +20,11 @@ class Repository
         }
     }
 
-    public function add($path, $splFileInfo)
+    public function add($destination, $splFileInfo)
     {
-        $this->createPath($path);
+        $this->createPath($destination);
 
-        $destination = $this->getRepositoryPath() . '/' . $path . '/' . $splFileInfo->getBaseName();
+        $destination = $this->getRepositoryPath() . '/' . $destination . '/' . $splFileInfo->getBaseName();
 
         $same = file_exists($destination) && (sha1_file($destination) == sha1_file($splFileInfo->getPathName()));
 
