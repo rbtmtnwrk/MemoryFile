@@ -31,6 +31,8 @@ class Transformer
             'video/avi'       => 'avi',
             'video/msvideo'   => 'avi',
             'video/x-msvideo' => 'avi',
+            'video/3gpp'      => 'mp4',
+            'video/mp4'       => 'mp4',
         ];
     }
 
@@ -61,18 +63,6 @@ class Transformer
     public function type($mimeType = null)
     {
         $mimeType = $mimeType ?: $this->mimeType();
-
-        $mimePhoto = [
-            'image/tiff' => 'tiff',
-            'image/jpeg' =>  'jpg',
-        ];
-
-        $mimeMovie = [
-            'video/quicktime' => 'mov',
-            'video/avi'       => 'avi',
-            'video/msvideo'   => 'avi',
-            'video/x-msvideo' => 'avi',
-        ];
 
         if (array_key_exists($mimeType, $this->getMimePhoto())) {
             return 'photo';
@@ -141,16 +131,22 @@ class Transformer
 
     public function source()
     {
+        $nosource = 'NO_SOURCE';
         if (! $this->hasIdf()) {
-            return 'NO_SOURCE';
+            return $nosource;
         }
 
         $source = [];
-        array_key_exists('Model', $this->exif['IFD0']) && $source[] = $this->exif['IFD0']['Model'];
-        (! $source) && array_key_exists('Make', $this->exif['IFD0']) && $source[] = $this->exif['IFD0']['Make'];
-        $source = strtoupper(implode(' ', $source));
-        $source = str_replace(' ', '_', $source);
-        $source = str_replace('-', '_', $source);
+        array_key_exists('Model', $this->exif['IFD0']) && ($source[] = $this->exif['IFD0']['Model']);
+        (! $source) && array_key_exists('Make', $this->exif['IFD0']) && ($source[] = $this->exif['IFD0']['Make']);
+
+        if ($source) {
+            $source = strtoupper(implode(' ', $source));
+            $source = str_replace(' ', '_', $source);
+            $source = str_replace('-', '_', $source);
+        } else {
+            $source = $nosource;
+        }
 
         return $source;
     }
@@ -173,7 +169,8 @@ class Transformer
         $date   = $this->date();
         $suffix = $type == 'movie' ? 'MOVIES' : $source;
         $destination    = $date['path'] . '/' . $suffix;
+        $exif   = $this->exif;
 
-        return compact('path', 'source', 'mime', 'type', 'date', 'destination');
+        return compact('path', 'source', 'mime', 'type', 'date', 'destination', 'exif');
     }
 }
