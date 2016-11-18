@@ -10,8 +10,13 @@ class Service
     protected $transformer;
     protected $repository;
 
-     use \MemoryFile\LoggableTrait;
-     use \MemoryFile\RepositoryPathTrait;
+    use \MemoryFile\LoggableTrait;
+    use \MemoryFile\RepositoryPathTrait;
+
+    public function getRepository()
+    {
+        return $this->repository();
+    }
 
     public static function create($repositoryPath)
     {
@@ -33,7 +38,7 @@ class Service
     {
         $directory = new \RecursiveDirectoryIterator($path);
         $filter    = new DirnameFilter($directory, '/^(?!\.Trash)/');
-        $filter    = new FilenameFilter($filter, '/\.(?:jpeg|jpg|tiff|mov)$/');
+        $filter    = new FilenameFilter($filter, '/\.(?:jpeg|jpg|tiff|mov|mp4|avi|wmv)$/');
 
         return new \RecursiveIteratorIterator($filter);
     }
@@ -50,6 +55,10 @@ class Service
                 continue;
             }
 
+            /**
+             * @NOTE: Temporary hacks until console command is in place.
+             */
+            var_dump($this->repositoryPath . '/' . $memoryfile['destination'] . '/' . $file->getBaseName());
             // var_dump(print_r([
             //     'MemoryFile'  => $memoryfile,
             //     'destination' => $this->repositoryPath . '/' . $memoryfile['destination'] . '/' . $file->getBaseName()
@@ -57,6 +66,20 @@ class Service
 
             $this->repository->add($memoryfile['destination'], $file);
         }
+    }
+
+    public function transformFile($path)
+    {
+        $file = new \SplFileInfo($path);
+
+        $exif = @exif_read_data($file->getPathName(), 0, true);
+        $memoryfile = $this->transformer->setExif($exif)->setSplFileInfo($file)->transform();
+
+        if ($memoryfile['mime'] == 'directory') {
+            return $path . ' is a directory';
+        }
+
+        return $memoryfile;
     }
 }
 
