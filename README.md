@@ -20,3 +20,38 @@ MemoryFile reads an image file's info, and places them in the following director
             .       .
 
 ```
+
+#### Sample Usage
+
+Using composer.
+
+```
+include 'MemoryFile/vendor/autoload.php';
+
+// Also set your timezone:
+date_default_timezone_set('America/New_York');
+```
+
+Import photos and movies.
+
+```
+. . .
+
+// Store files here
+$service = \MemoryFile\Service::create('/memories');
+
+// Import files from here
+$service->import('/photos_and_movies');
+```
+
+Transform a specific file. Good for inspecting it's EXIF information.
+
+```
+. . .
+
+$service = \MemoryFile\Service::create('/memories');
+
+$memoryfile = $service->transformFile('/photos_and_movies/IMG_0001.JPG');
+
+var_dump(print_r($memoryfile, true));
+```
