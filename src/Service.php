@@ -55,17 +55,30 @@ class Service
                 continue;
             }
 
-            /**
-             * @NOTE: Temporary hacks until console command is in place.
-             */
-            var_dump($this->repositoryPath . '/' . $memoryfile['destination'] . '/' . $file->getBaseName());
-            // var_dump(print_r([
-            //     'MemoryFile'  => $memoryfile,
-            //     'destination' => $this->repositoryPath . '/' . $memoryfile['destination'] . '/' . $file->getBaseName()
-            // ], true));
+            if (! $this->repository->add($memoryfile['folder'], $file)->getLastResult()) {
 
-            $this->repository->add($memoryfile['destination'], $file);
+                $this->getLog('import')->warning('Duplicate File', [
+                    'source' => $file->getPathName(),
+                    'destination' => $this->repository->getLastDestination(),
+                ]);
+
+                /**
+                 * @NOTE: Temporary echo until console command is in place.
+                 */
+                echo '.';
+
+                continue;
+            }
+
+            /**
+             * @NOTE: Temporary echo until console command is in place.
+             */
+            echo '+';
+
+            $this->getLog('import')->info($this->repository->getLastDestination());
         }
+
+        echo " Done\n";
     }
 
     public function transformFile($path)

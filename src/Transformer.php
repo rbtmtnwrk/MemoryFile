@@ -168,9 +168,9 @@ class Transformer
         $type   = $this->type($mime);
         $date   = $this->date();
         $suffix = $type == 'movie' ? 'MOVIES' : $source;
-        $destination    = $date['path'] . '/' . $suffix;
+        $folder = $date['path'] . '/' . $suffix;
         $exif   = $this->exif;
 
-        return compact('path', 'source', 'mime', 'type', 'date', 'destination', 'exif');
+        return compact('path', 'source', 'mime', 'type', 'date', 'folder', 'exif');
     }
 }

@@ -5,9 +5,20 @@ class Repository
 {
     protected $repositoryPath;
     protected $log;
+    protected $lastDestination;
+    protected $lastResult;
 
-    use \MemoryFile\LoggableTrait;
     use \MemoryFile\RepositoryPathTrait;
+
+    public function getLastDestination()
+    {
+        return $this->lastDestination;
+    }
+
+    public function getLastResult()
+    {
+        return $this->lastResult;
+    }
 
     private function createPath($path)
     {
@@ -20,17 +31,18 @@ class Repository
         }
     }
 
-    public function add($destination, $splFileInfo)
+    public function add($folder, $splFileInfo)
     {
-        $this->createPath($destination);
+        $this->createPath($folder);
 
-        $destination = $this->getRepositoryPath() . '/' . $destination . '/' . $splFileInfo->getBaseName();
+        $destination = $this->getRepositoryPath() . '/' . $folder . '/' . $splFileInfo->getBaseName();
 
-        $same = file_exists($destination) && (sha1_file($destination) == sha1_file($splFileInfo->getPathName()));
+        $dupe = file_exists($destination) && (sha1_file($destination) == sha1_file($splFileInfo->getPathName()));
 
-        $same && $this->getLog()->warning('Memory Exists:' . $destination);
+        (! $dupe) && copy($splFileInfo->getPathName(), $destination);
 
-        (! $same) && copy($splFileInfo->getPathName(), $destination);
+        $this->lastDestination = $destination;
+        $this->lastResult = ! $dupe;
 
         return $this;
     }
