@@ -41,13 +41,42 @@ namespace MemoryFile\FileSystem;
  */
 class FilenameFilter extends AbstractFilesystemRegexFilter
 {
+    protected $filtered;
+    protected $folders;
+
+    public function getFiltered()
+    {
+        return $this->filtered;
+    }
+
+    public function getFolders()
+    {
+        return $this->folders;
+    }
+
+    public function __construct()
+    {
+        $this->filtered = [];
+        $this->folders  = [];
+
+        call_user_func_array(array($this, 'parent::__construct'), func_get_args());
+    }
+
     /**
-     * Filter files against the regex
+     * Filter files against the regex. Add to filtered array if not accepted.
      * @return string
      */
     public function accept()
     {
-        return ( ! $this->isFile() || preg_match($this->regex, strtolower($this->getFilename())));
+        $accepted = (! $this->isFile() || preg_match($this->regex, strtolower($this->getFilename())));
+
+        if ($this->isFile()) {
+            (! $accepted) && ($this->filtered[] = $this->getPathName());
+        } else {
+            (! in_array($this->getFilename(), ['.', '..'])) && ($this->folders[] = $this->getPathName());
+        }
+
+        return $accepted;
     }
 }
 
