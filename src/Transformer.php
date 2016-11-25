@@ -20,7 +20,8 @@ class Transformer
     {
         return [
             'image/tiff' => 'tiff',
-            'image/jpeg' =>  'jpg',
+            'image/jpeg' =>  'jpg|jpeg',
+            'image/x-canon-crw' =>  'crw',
         ];
     }
 
@@ -31,6 +32,7 @@ class Transformer
             'video/avi'       => 'avi',
             'video/msvideo'   => 'avi',
             'video/x-msvideo' => 'avi',
+            'video/x-ms-wmv'  => 'wmv',
             'video/3gpp'      => 'mp4',
             'video/mp4'       => 'mp4',
         ];
