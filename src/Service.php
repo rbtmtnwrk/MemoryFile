@@ -6,8 +6,10 @@ use MemoryFile\FileSystem\FilenameFilter;
 
 class Service
 {
+    protected $filter;
     protected $repositoryPath;
     protected $transformer;
+    protected $extensions;
     protected $repository;
 
     use \MemoryFile\LoggableTrait;
@@ -37,15 +39,23 @@ class Service
     public function createIterator($path)
     {
         $directory = new \RecursiveDirectoryIterator($path);
-        $filter    = new DirnameFilter($directory, '/^(?!\.Trash)/');
-        $filter    = new FilenameFilter($filter, '/\.(?:jpeg|jpg|tiff|mov|mp4|avi|wmv)$/');
 
-        return new \RecursiveIteratorIterator($filter);
+        $this->filter = new DirnameFilter($directory, '/^(?!\.Trash)/');
+
+        $mime = array_merge($this->transformer->getMimePhoto(), $this->transformer->getMimeMovie());
+        $mime = array_flip(array_flip(array_values($mime)));
+        $this->extensions  = implode('|', $mime);
+
+        $this->filter = new FilenameFilter($this->filter, '/\.(?:' . $this->extensions . ')$/');
+
+        return new \RecursiveIteratorIterator($this->filter);
     }
 
     public function import($path)
     {
         $iterator = $this->createIterator($path);
+        $count    = 0;
+        $added    = 0;
 
         foreach ($iterator as $file) {
             $exif = @exif_read_data($file->getPathName(), 0, true);
@@ -56,6 +66,8 @@ class Service
             }
 
             if (! $this->repository->add($memoryfile['folder'], $file)->getLastResult()) {
+
+                $count++;
 
                 $this->getLog('import')->warning('Duplicate File', [
                     'source' => $file->getPathName(),
@@ -74,11 +86,38 @@ class Service
              * @NOTE: Temporary echo until console command is in place.
              */
             echo '+';
+            $added++;
 
             $this->getLog('import')->info($this->repository->getLastDestination());
         }
 
-        echo " Done\n";
+        $report = [
+            'Total Files and Directories' => $count + count($this->filter->getFiltered()) + count($this->filter->getFolders()),
+            'Extensions'     => $this->extensions,
+            'Filtered Files' => $this->filter->getFiltered(),
+            'Folders'        => $this->filter->getFolders(),
+            'Added'          => $added,
+
+        ];
+
+        $this->getLog('import')->info('Import Completed', $report);
+
+        $echo = "\nImport Completed\n";
+        foreach ($report as $key => $value) {
+            if (is_array($value)) {
+                $valueOutput = '';
+                foreach($value as $val) {
+                    $valueOutput .= "- $val\n";
+                }
+
+                $echo .= "$key:\n$valueOutput";
+            } else {
+                $echo .= "$key:  $value\n";
+            }
+
+        }
+
+        echo $echo;
     }
 
     public function transformFile($path)
