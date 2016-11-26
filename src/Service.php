@@ -65,9 +65,10 @@ class Service
                 continue;
             }
 
+            $count++;
+
             if (! $this->repository->add($memoryfile['folder'], $file)->getLastResult()) {
 
-                $count++;
 
                 $this->getLog('import')->warning('Duplicate File', [
                     'source' => $file->getPathName(),
