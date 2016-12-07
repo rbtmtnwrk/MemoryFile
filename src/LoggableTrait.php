@@ -6,7 +6,7 @@ use Monolog\Handler\RotatingFileHandler;
 
 trait LoggableTrait
 {
-    public function getLog($type = 'import')
+    public function getLog($name = 'import')
     {
         if (! $this->repositoryPath) {
             throw new \Exception('No repositoryPath set for LoggableTrait::getLog');
@@ -16,12 +16,14 @@ trait LoggableTrait
             $this->log = [];
         }
 
-        if (! array_key_exists($type, $this->log)) {
-            $this->log[$type] = new Logger($type);
-            $this->log[$type]->pushHandler(new RotatingFileHandler($this->repositoryPath . '/' . $type . '.log', Logger::WARNING));
+        $name = mb_ereg_replace("([^\w\s\d\-_~,;\[\]\(\).])", '_', $name);
+
+        if (! array_key_exists($name, $this->log)) {
+            $this->log[$name] = new Logger($name);
+            $this->log[$name]->pushHandler(new RotatingFileHandler($this->repositoryPath . '/' . $name . '.log', Logger::WARNING));
         }
 
-        return $this->log[$type];
+        return $this->log[$name];
     }
 }
 
