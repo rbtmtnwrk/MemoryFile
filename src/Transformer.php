@@ -20,6 +20,7 @@ class Transformer
     {
         return [
             'image/tiff' => 'tiff',
+            'image/gif'  =>  'gif',
             'image/jpeg' =>  'jpg|jpeg',
             'image/x-canon-crw' =>  'crw',
         ];
