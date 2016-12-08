@@ -67,10 +67,8 @@ class Service
 
             $count++;
 
-            if (! $this->repository->add($memoryfile['folder'], $file)->getLastResult()) {
-
-
-                $this->getLog('import')->warning('Duplicate File', [
+            if ($this->repository->add($memoryfile['folder'], $file)->wasDuplicate()) {
+                $this->getLog($path)->warning('Duplicate File', [
                     'source' => $file->getPathName(),
                     'destination' => $this->repository->getLastDestination(),
                 ]);
@@ -89,7 +87,7 @@ class Service
             echo '+';
             $added++;
 
-            $this->getLog('import')->info($this->repository->getLastDestination());
+            $this->getLog($path)->info($this->repository->getLastDestination());
         }
 
         $report = [
@@ -101,7 +99,7 @@ class Service
 
         ];
 
-        $this->getLog('import')->info('Import Completed', $report);
+        $this->getLog($path)->info('Import Completed', $report);
 
         $echo = "\nImport Completed\n";
         foreach ($report as $key => $value) {
