@@ -8,10 +8,10 @@ class TransformerTest extends TestCase
     {
         $transformer = new Transformer;
 
-        var_dump(print_r([
-            'getMimePhoto' => $transformer->getMimePhoto(),
-            'getMimeMovie' => $transformer->getMimeMovie(),
-        ], true));
+        // var_dump(print_r([
+        //     'getMimePhoto' => $transformer->getMimePhoto(),
+        //     'getMimeMovie' => $transformer->getMimeMovie(),
+        // ], true));
 
         $this->assertEquals(true, is_array($transformer->getMimePhoto()));
         $this->assertEquals(true, is_array($transformer->getMimeMovie()));

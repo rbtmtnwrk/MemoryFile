@@ -69,14 +69,14 @@ class Service
 
             if ($this->repository->add($memoryfile['folder'], $file)->wasDuplicate()) {
                 $this->getLog($path)->warning('Duplicate File', [
-                    'source' => $file->getPathName(),
-                    'destination' => $this->repository->getLastDestination(),
+                    'source'      => $file->getPathName(),
+                    'destination' => $this->repository->getDestination(),
                 ]);
 
                 /**
                  * @NOTE: Temporary echo until console command is in place.
                  */
-                echo '.';
+                echo 'Duplicate [' . $file->getPathName() . ' | ' . $this->repository->getDestination() . ']' . "\n";
 
                 continue;
             }
@@ -84,10 +84,10 @@ class Service
             /**
              * @NOTE: Temporary echo until console command is in place.
              */
-            echo '+';
+            echo '+ ' . $file->getPathName() . ' | ' . $this->repository->getDestination() . "\n";
             $added++;
 
-            $this->getLog($path)->info($this->repository->getLastDestination());
+            $this->getLog($path)->info($this->repository->getDestination());
         }
 
         $report = [

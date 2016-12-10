@@ -10,10 +10,10 @@ class SerivceTest extends TestCase
 
         $service = Service::create($dir);
 
-        var_dump(print_r([
-            'file' => __FILE__ . ' line ' . __LINE__,
-            'service' => $service,
-        ], true));
+        // var_dump(print_r([
+        //     'file' => __FILE__ . ' line ' . __LINE__,
+        //     'service' => $service,
+        // ], true));
     }
 }
 

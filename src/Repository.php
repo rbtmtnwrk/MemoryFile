@@ -5,8 +5,7 @@ class Repository
 {
     protected $repositoryPath;
     protected $log;
-    protected $lastDestination;
-    protected $lastResult;
+    protected $destination;
     protected $duplicate;
 
     use \MemoryFile\RepositoryPathTrait;
@@ -16,11 +15,16 @@ class Repository
         return $this->duplicate;
     }
 
-    public function getLastDestination()
+    public function getDestination()
     {
-        return $this->lastDestination;
+        return $this->destination;
     }
 
+    /**
+     * Creates the given path.
+     * @param  string $path
+     * @return this
+     */
     private function createPath($path)
     {
         $subs  = explode('/', $path);
@@ -30,8 +34,16 @@ class Repository
             $check .= '/' . $sub;
             ! file_exists($check) && mkdir($check, 0777);
         }
+
+        return $this;
     }
 
+    /**
+     * Increments a file name.
+     * @param  \SplFileInfo $splFileInfo [description]
+     * @param  string $destination
+     * @return string
+     */
     public function incrementFile($splFileInfo, $destination) {
         $ext      = $splFileInfo->getExtension();
         $filename = trim($splFileInfo->getBaseName($ext), '.');
@@ -54,6 +66,12 @@ class Repository
         return implode('/', $destinationParts);
     }
 
+    /**
+     * Add a file to the repository.
+     * @param string $folder
+     * @param \SplFileInfo $splFileInfo
+     * @return this
+     */
     public function add($folder, $splFileInfo)
     {
         $this->createPath($folder);
@@ -64,14 +82,17 @@ class Repository
 
         (! $copyable['duplicate']) && copy($splFileInfo->getPathName(), $copyable['destination']);
 
-        $this->lastDestination = $copyable['destination'];
-        $this->duplicate       = $copyable['duplicate'];
+        $this->destination  = $copyable['destination'];
+        $this->duplicate = $copyable['duplicate'];
 
         return $this;
     }
 
     /**
-     * @TODO: Fix this
+     * Determines if the file is a duplicate in the given destination. If not it attempts to increment.
+     * @param  \SplFileInfo $splFileInfo
+     * @param  string $destination
+     * @return array
      */
     public function copyable($splFileInfo, $destination)
     {
