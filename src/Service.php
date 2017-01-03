@@ -1,9 +1,6 @@
 <?php
 namespace MemoryFile;
 
-use MemoryFile\FileSystem\DirnameFilter;
-use MemoryFile\FileSystem\FilenameFilter;
-
 class Service
 {
     protected $filter;
@@ -38,32 +35,49 @@ class Service
 
     public function createIterator($path)
     {
-        $directory = new \RecursiveDirectoryIterator($path);
+        $iterator = new \RecursiveDirectoryIterator($path);
 
-        $this->filter = new DirnameFilter($directory, '/^(?!\.Trash)/');
+        return new \RecursiveIteratorIterator($iterator);
+    }
 
+    public function getRegex()
+    {
         $mime = array_merge($this->transformer->getMimePhoto(), $this->transformer->getMimeMovie());
         $mime = array_flip(array_flip(array_values($mime)));
         $this->extensions  = implode('|', $mime);
 
-        $this->filter = new FilenameFilter($this->filter, '/\.(?:' . $this->extensions . ')$/');
-
-        return new \RecursiveIteratorIterator($this->filter);
+        return '/\.(?:' . $this->extensions . ')$/';
     }
 
     public function import($path)
     {
         $iterator = $this->createIterator($path);
+        $regex    = $this->getRegex();
         $count    = 0;
         $added    = 0;
+        $folders  = [];
+        $skipped  = [];
+
+        echo 'Starting import for: ' . $path . "\n";
 
         foreach ($iterator as $file) {
-            $exif = @exif_read_data($file->getPathName(), 0, true);
-            $memoryfile = $this->transformer->setExif($exif)->setSplFileInfo($file)->transform();
 
-            if ($memoryfile['mime'] == 'directory') {
+            /**
+             * Filter for extension and directory
+             */
+            if ($file->isFile()) {
+                if (! preg_match($regex, strtolower($file->getFilename()))) {
+                    $skipped[] = $file->getPathName();
+                    continue;
+                }
+            } else {
+                $file->getFilename() == '.' && ($folders[] = trim($file->getPathName(), '.'));
+
                 continue;
             }
+
+            $exif = @exif_read_data($file->getPathName(), 0, true);
+            $memoryfile = $this->transformer->setExif($exif)->setSplFileInfo($file)->transform();
 
             $count++;
 
@@ -90,13 +104,17 @@ class Service
             $this->getLog($path)->info($this->repository->getDestination());
         }
 
-        $report = [
-            'Total Files and Directories' => $count + count($this->filter->getFiltered()) + count($this->filter->getFolders()),
-            'Extensions'     => $this->extensions,
-            'Filtered Files' => $this->filter->getFiltered(),
-            'Folders'        => $this->filter->getFolders(),
-            'Added'          => $added,
+        /**
+         * Remove the initial folder as it is implied.
+         */
+        array_shift($folders);
 
+        $report = [
+            'Total Files'    => $count + count($skipped),
+            'Extensions'     => $this->extensions,
+            'Filtered Files' => $skipped,
+            'Folders'        => $folders,
+            'Added'          => $added,
         ];
 
         $this->getLog($path)->info('Import Completed', $report);
