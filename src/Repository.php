@@ -46,16 +46,16 @@ class Repository
      */
     public function incrementFile($splFileInfo, $destination) {
         $ext      = $splFileInfo->getExtension();
-        $filename = trim($splFileInfo->getBaseName($ext), '.');
+        $path     = chop($destination, '.' . $ext);
+        $filename = end(explode('/', $path));
         $parts    = explode('_', $filename);
         $mfx      = array_search('MF', $parts);
 
-        if ($mfx) {
+        if ($mfx !== false) {
             $index = $parts[$mfx + 1];
             $parts[$mfx + 1] = $index + 1;
         } else {
-            $parts[] = 'MF';
-            $parts[] = '1';
+            array_unshift($parts, 'MF', '1');
         }
 
         $newname = implode('_', $parts) . '.' . $ext;

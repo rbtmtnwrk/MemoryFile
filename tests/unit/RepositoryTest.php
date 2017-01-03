@@ -10,7 +10,13 @@ class RepositoryTest extends TestCase
         $path        = getcwd() . '/tests/files/RepositoryTestFile.txt';
         $file        = new \SplFileInfo($path);
         $destination = $repository->incrementFile($file, getcwd() . '/tests/files/RepositoryTestFile.txt');
-        $expected    = getcwd() . '/tests/files/RepositoryTestFile_MF_1.txt';
+        $expected    = getcwd() . '/tests/files/MF_1_RepositoryTestFile.txt';
+
+        var_dump(print_r([
+            'file' => __FILE__ . ' line ' . __LINE__,
+            'destination' => $destination,
+            'expected' => $expected,
+        ], true));
 
         $this->assertEquals($expected, $destination);
     }
@@ -18,10 +24,16 @@ class RepositoryTest extends TestCase
     public function test_second_file_increment()
     {
         $repository  = new Repository;
-        $path        = getcwd() . '/tests/files/RepositoryTestFile_MF_1.txt';
+        $path        = getcwd() . '/tests/files/MF_1_RepositoryTestFile.txt';
         $file        = new \SplFileInfo($path);
         $destination = $repository->incrementFile($file, $path);
-        $expected    = getcwd() . '/tests/files/RepositoryTestFile_MF_2.txt';
+        $expected    = getcwd() . '/tests/files/MF_2_RepositoryTestFile.txt';
+
+        var_dump(print_r([
+            'file' => __FILE__ . ' line ' . __LINE__,
+            'destination' => $destination,
+            'expected' => $expected,
+        ], true));
 
         $this->assertEquals($expected, $destination);
     }
