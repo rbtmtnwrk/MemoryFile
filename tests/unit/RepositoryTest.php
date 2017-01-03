@@ -12,12 +12,6 @@ class RepositoryTest extends TestCase
         $destination = $repository->incrementFile($file, getcwd() . '/tests/files/RepositoryTestFile.txt');
         $expected    = getcwd() . '/tests/files/MF_1_RepositoryTestFile.txt';
 
-        var_dump(print_r([
-            'file' => __FILE__ . ' line ' . __LINE__,
-            'destination' => $destination,
-            'expected' => $expected,
-        ], true));
-
         $this->assertEquals($expected, $destination);
     }
 
@@ -28,12 +22,6 @@ class RepositoryTest extends TestCase
         $file        = new \SplFileInfo($path);
         $destination = $repository->incrementFile($file, $path);
         $expected    = getcwd() . '/tests/files/MF_2_RepositoryTestFile.txt';
-
-        var_dump(print_r([
-            'file' => __FILE__ . ' line ' . __LINE__,
-            'destination' => $destination,
-            'expected' => $expected,
-        ], true));
 
         $this->assertEquals($expected, $destination);
     }
@@ -50,12 +38,6 @@ class RepositoryTest extends TestCase
             'duplicate'   => true,
         ];
 
-        // var_dump(print_r([
-        //     'file' => __FILE__ . ' line ' . __LINE__,
-        //     'copyable' => $copyable,
-        //     'file' => $file,
-        // ], true));
-
         $this->assertSame($expected, $copyable);
     }
 
@@ -70,12 +52,6 @@ class RepositoryTest extends TestCase
             'destination' => getcwd() . '/tests/files/RepositoryTestFile_MF_2.txt',
             'duplicate'   => false,
         ];
-
-        // var_dump(print_r([
-        //     'file' => __FILE__ . ' line ' . __LINE__,
-        //     'copyable' => $copyable,
-        //     'file' => $file,
-        // ], true));
 
         $this->assertSame($expected, $copyable);
     }
