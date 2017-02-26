@@ -57,6 +57,7 @@ class Service
         $added    = 0;
         $folders  = [];
         $skipped  = [];
+        $destinations = [];
 
         echo 'Starting import for: ' . $path . "\n";
 
@@ -72,13 +73,11 @@ class Service
                 }
             } else {
                 $file->getFilename() == '.' && ($folders[] = trim($file->getPathName(), '.'));
-
                 continue;
             }
 
             $exif = @exif_read_data($file->getPathName(), 0, true);
             $memoryfile = $this->transformer->setExif($exif)->setSplFileInfo($file)->transform();
-
             $count++;
 
             if ($this->repository->add($memoryfile['folder'], $file)->wasDuplicate()) {
@@ -91,13 +90,13 @@ class Service
                  * @NOTE: Temporary echo until console command is in place.
                  */
                 echo 'Duplicate [' . $file->getPathName() . ' | ' . $this->repository->getDestination() . ']' . "\n";
-
                 continue;
             }
 
             /**
              * @NOTE: Temporary echo until console command is in place.
              */
+            $destinations[dirname($this->repository->getDestination())] = 1;
             echo '+ ' . $file->getPathName() . ' | ' . $this->repository->getDestination() . "\n";
             $added++;
 
@@ -110,11 +109,12 @@ class Service
         array_shift($folders);
 
         $report = [
-            'Total Files'    => $count + count($skipped),
             'Extensions'     => $this->extensions,
+            'Folders Read'   => $folders,
             'Filtered Files' => $skipped,
-            'Folders'        => $folders,
-            'Added'          => $added,
+            'Total Files'    => $count + count($skipped),
+            'Added Files'    => $added,
+            'Destination Paths' => array_keys($destinations),
         ];
 
         $this->getLog($path)->info('Import Completed', $report);
@@ -131,7 +131,7 @@ class Service
             } else {
                 $echo .= "$key:  $value\n";
             }
-
+            $echo .= "\n";
         }
 
         echo $echo;
