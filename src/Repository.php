@@ -45,7 +45,7 @@ class Repository
      * @return string
      */
     public function incrementFile($splFileInfo, $destination) {
-        $ext      = $splFileInfo->getExtension();
+        $ext      = $memoryFile['splFileInfo']->getExtension();
         $path     = chop($destination, '.' . $ext);
         $filename = end(explode('/', $path));
         $parts    = explode('_', $filename);
@@ -72,18 +72,18 @@ class Repository
      * @param \SplFileInfo $splFileInfo
      * @return this
      */
-    public function add($folder, $splFileInfo)
+    public function add($memoryFile)
     {
-        $this->createPath($folder);
+        $this->createPath($memoryFile['folder']);
 
-        $destination = $this->getRepositoryPath() . '/' . $folder . '/' . $splFileInfo->getBaseName();
+        $destination = $this->getRepositoryPath() . '/' . $memoryFile['folder'] . '/' . $memoryFile['name'];
 
-        $copyable = $this->copyable($splFileInfo, $destination);
+        $copyable = $this->copyable($memoryFile, $destination);
 
-        (! $copyable['duplicate']) && copy($splFileInfo->getPathName(), $copyable['destination']);
+        (! $copyable['duplicate']) && copy($memoryFile['splFileInfo']->getPathName(), $copyable['destination']);
 
-        $this->destination  = $copyable['destination'];
-        $this->duplicate = $copyable['duplicate'];
+        $this->destination = $copyable['destination'];
+        $this->duplicate   = $copyable['duplicate'];
 
         return $this;
     }
@@ -94,18 +94,18 @@ class Repository
      * @param  string $destination
      * @return array
      */
-    public function copyable($splFileInfo, $destination)
+    public function copyable($memoryFile, $destination)
     {
         $copyable = ['destination' => $destination, 'duplicate' => false];
 
         if (file_exists($destination)) {
-            $copyable['duplicate'] = (sha1_file($destination) == sha1_file($splFileInfo->getPathName()));
+            $copyable['duplicate'] = (sha1_file($destination) == sha1_file($memoryFile['splFileInfo']->getPathName()));
 
             if ($copyable['duplicate']) {
                 return $copyable;
             } else {
-                $destination = $this->incrementFile($splFileInfo, $destination);
-                return $this->copyable($splFileInfo, $destination);
+                $destination = $this->incrementFile($memoryFile, $destination);
+                return $this->copyable($memoryFile, $destination);
             }
         }
 

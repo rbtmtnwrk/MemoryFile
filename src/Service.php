@@ -80,7 +80,7 @@ class Service
             $memoryfile = $this->transformer->setExif($exif)->setSplFileInfo($file)->transform();
             $count++;
 
-            if ($this->repository->add($memoryfile['folder'], $file)->wasDuplicate()) {
+            if ($this->repository->add($memoryfile)->wasDuplicate()) {
                 $this->getLog($path)->warning('Duplicate File', [
                     'source'      => $file->getPathName(),
                     'destination' => $this->repository->getDestination(),

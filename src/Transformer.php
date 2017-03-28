@@ -5,8 +5,14 @@ class Transformer
 {
     protected $exif;
     protected $splFileInfo;
+    protected $dateInfo;
 
-    public function getDatePath($dateInt)
+    public function getDateInfo()
+    {
+        return $this->dateInfo;
+    }
+
+    public function formatDatePath($dateInt)
     {
         return strtoupper(date("Y/m", $dateInt) . '_' . date("M", $dateInt));
     }
@@ -92,25 +98,28 @@ class Transformer
      * Windows and Mac only. Linux we are SOL.
      * @return array
      */
-    public function date()
+    public function parseFileDate()
     {
+        $xifDate    = null;
         $systemDate = $this->splFileInfo->getCTime();
         $systemDate = $this->isMac() ? $this->statDate() : $systemDate;
-        $xifDate    = null;
-        $path       = null;
 
-        $this->hasExif() && isset($this->exif['EXIF']['DateTimeOriginal']) && ($xifDate = strtotime($this->exif['EXIF']['DateTimeOriginal']));
+        if ($this->hasExif()) {
+            isset($this->exif['EXIF']['DateTimeOriginal']) && ($xifDate = strtotime($this->exif['EXIF']['DateTimeOriginal']));
 
-        (! $xifDate) && $this->hasExif() && isset($this->exif['IDF0']['DateTime']) && ($xifDate = strtotime($this->exif['IDF0']['DateTime']));
+            (! $xifDate) && isset($this->exif['IDF0']['DateTime']) && ($xifDate = strtotime($this->exif['IDF0']['DateTime']));
+        }
 
-        $xifDate && ($path = $this->getDatePath($xifDate));
+        $this->dateInfo = [
+            'xifDate'    => date($this->getDateFormat(), $xifDate),
+            'systemDate' => date($this->getDateFormat(), $systemDate),
+        ];
 
-        (! $path) && ($path = $this->getDatePath($systemDate));
+        if ($xifDate) {
+            return $xifDate;
+        }
 
-        $systemDate = date($this->getDateFormat(), $systemDate);
-        $xifDate    = date($this->getDateFormat(), $xifDate);
-
-        return compact('systemDate', 'xifDate', 'path');
+        return $systemDate;
     }
 
     /**
@@ -163,17 +172,29 @@ class Transformer
         return mime_content_type($this->splFileInfo->getPathName());
     }
 
+    public function formatBaseName($fileDate)
+    {
+        $datePrefix = date('dHis_', $fileDate);
+        return $datePrefix . $this->splFileInfo->getBaseName();
+    }
+
     public function transform()
     {
-        $path   = $this->splFileInfo->getPathName();
-        $source = $this->source();
-        $mime   = $this->mimeType();
-        $type   = $this->type($mime);
-        $date   = $this->date();
-        $suffix = $type == 'movie' ? 'MOVIES' : $source;
-        $folder = $date['path'] . '/' . $suffix;
-        $exif   = $this->exif;
+        $fileDate  = $this->parseFileDate();
+        $source    = $this->source();
+        $subFolder = $type == 'movie' ? 'MOVIES' : $source;
 
-        return compact('path', 'source', 'mime', 'type', 'date', 'folder', 'exif');
+        return [
+            'path'        => $this->splFileInfo->getPathName(),
+            'name'        => $this->formatBaseName($fileDate),
+            'source'      => $source,
+            'mime'        => $this->mimeType(),
+            'type'        => $this->type($mime),
+            'fileDates'   => $this->getDateInfo(),
+            'subFolder'   => $subFolder,
+            'folder'      => $this->formatDatePath($fileDate) . '/' . $subFolder,
+            'exif'        => $this->exif,
+            'splFileInfo' => $this->splFileInfo,
+        ];
     }
-}
+};
