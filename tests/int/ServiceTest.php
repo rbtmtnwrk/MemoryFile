@@ -1,19 +1,31 @@
 <?php
 use MemoryFile\Service;
-use MemoryFile\Testing\TestCase;
+use MemoryFile\Testing\IntegrationCase;
 
-class SerivceTest extends TestCase
+class SerivceTest extends IntegrationCase
 {
     public function test_service_create()
     {
-        $dir = '/test/directory';
+        $service = Service::create($this->getRepositoryDir());
 
-        $service = Service::create($dir);
+        $this->assertEquals(true, !!$service);
+    }
 
-        // var_dump(print_r([
-        //     'file' => __FILE__ . ' line ' . __LINE__,
-        //     'service' => $service,
-        // ], true));
+    public function test_info_file()
+    {
+        $service = Service::create($this->getRepositoryDir());
+
+        $memoryfile = [
+            'folder'    => 'month',
+            'subFolder' => 'camera',
+        ];
+
+        $service->writeInfoFile($memoryfile, 'Fun Day');
+        $filepath = $this->getRepositoryDir() . '/month/Fun Day.md';
+
+        $this->assertEquals(true, file_exists($filepath));
+
+        unlink($filepath);
     }
 }
 

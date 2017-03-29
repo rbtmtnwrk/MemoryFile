@@ -49,7 +49,31 @@ class Service
         return '/\.(?:' . $this->extensions . ')$/';
     }
 
-    public function import($path)
+    /**
+     * Writes md info file into the directory of the imported files.
+     * Info files are hints to the contents of the folder.
+     * @param  string $path
+     * @param  string $info
+     * @param  string $appendInfo
+     * @return void
+     */
+    public function writeInfoFile($memoryfile, $info, $appendInfo = null)
+    {
+        $name = $info . '.md';
+        $path = $this->repository->getRepositoryPath() . '/' . $memoryfile['folder'];
+
+        /**
+         * Write initial file if not there.
+         */
+        ! file_exists($path . '/' . $info . '.md') && file_put_contents($path . '/' . $name, "# $info\n", FILE_APPEND);
+
+        /**
+         * Append info
+         */
+        file_put_contents($path . '/' . $name, $appendInfo . "\n", FILE_APPEND);
+    }
+
+    public function import($path, $info = null)
     {
         $iterator = $this->createIterator($path);
         $regex    = $this->getRegex();
@@ -98,6 +122,12 @@ class Service
              */
             $destinations[dirname($this->repository->getDestination())] = 1;
             echo '+ ' . $file->getPathName() . ' | ' . $this->repository->getDestination() . "\n";
+
+            /**
+             * Write info file if given.
+             */
+            $info && $this->writeInfoFile($memoryfile, $info, $memoryfile['subFolder'] . '/' . $memoryfile['name']);
+
             $added++;
 
             $this->getLog($path)->info($this->repository->getDestination());
