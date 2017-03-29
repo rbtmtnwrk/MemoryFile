@@ -1,9 +1,9 @@
 <?php
 use MemoryFile\Service;
 use MemoryFile\Repository;
-use MemoryFile\Testing\TestCase;
+use MemoryFile\Testing\IntegrationCase;
 
-class RepositoryTest extends TestCase
+class RepositoryTest extends IntegrationCase
 {
     public function test_file_increment()
     {
