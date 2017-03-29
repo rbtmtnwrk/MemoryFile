@@ -192,7 +192,7 @@ class Transformer
             'type'        => $this->type($mime),
             'fileDates'   => $this->getDateInfo(),
             'subFolder'   => $subFolder,
-            'folder'      => $this->formatDatePath($fileDate) . '/' . $subFolder,
+            'folder'      => $this->formatDatePath($fileDate),
             'exif'        => $this->exif,
             'splFileInfo' => $this->splFileInfo,
         ];
