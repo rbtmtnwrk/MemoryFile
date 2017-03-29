@@ -44,7 +44,7 @@ class Repository
      * @param  string $destination
      * @return string
      */
-    public function incrementFile($splFileInfo, $destination) {
+    public function incrementFile($memoryFile, $destination) {
         $ext      = $memoryFile['splFileInfo']->getExtension();
         $path     = chop($destination, '.' . $ext);
         $filename = end(explode('/', $path));
@@ -74,9 +74,10 @@ class Repository
      */
     public function add($memoryFile)
     {
-        $this->createPath($memoryFile['folder']);
+        $subFolder = $memoryFile['folder'] . '/' . $memoryFile['subFolder'];
+        $this->createPath($subFolder);
 
-        $destination = $this->getRepositoryPath() . '/' . $memoryFile['folder'] . '/' . $memoryFile['name'];
+        $destination = $this->getRepositoryPath() . '/' . $subFolder . '/' . $memoryFile['name'];
 
         $copyable = $this->copyable($memoryFile, $destination);
 
