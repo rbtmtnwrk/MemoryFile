@@ -181,6 +181,8 @@ class Transformer
     public function transform()
     {
         $fileDate  = $this->parseFileDate();
+        $mime      = $this->mimeType();
+        $type      = $this->type($mime);
         $source    = $this->source();
         $subFolder = $type == 'movie' ? 'MOVIES' : $source;
 
@@ -188,8 +190,8 @@ class Transformer
             'path'        => $this->splFileInfo->getPathName(),
             'name'        => $this->formatBaseName($fileDate),
             'source'      => $source,
-            'mime'        => $this->mimeType(),
-            'type'        => $this->type($mime),
+            'mime'        => $mime,
+            'type'        => $type,
             'fileDates'   => $this->getDateInfo(),
             'subFolder'   => $subFolder,
             'folder'      => $this->formatDatePath($fileDate),
